@@ -4,11 +4,13 @@ Gem::Specification.new do |s|
   s.version = '0.0.4'
   s.date = '2020-07-04'
   s.files = [
-      'lib/cql.rb',
-      'lib/cql/executor.rb',
-      'lib/cql/crumb_collector.rb',
-      'lib/cql/abstract_printer.rb',
-      'lib/cql/console_printer.rb',
+    'lib/cql.rb',
+    'lib/cql/executor.rb',
+    'lib/cql/crumb_collector.rb',
+    'lib/cql/abstract_printer.rb',
+    'lib/cql/console_printer.rb',
+    'lib/cql/filter_reader.rb',
+    'lib/cql/filter_evaluator.rb',
   ]
   s.require_paths = ['lib']
   s.authors = ['itarato']

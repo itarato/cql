@@ -10,7 +10,7 @@ require 'parser/current'
 # @param path [String]
 # @param filters [Array<String>]
 #
-CQL::Executor = Struct.new(:collector, :pattern, :path, :filters) do
+CQL::Executor = Struct.new(:collector, :filter_reader, :pattern, :path, :filters) do
   def search_all
     files.flat_map do |file|
       search(file)
@@ -33,13 +33,16 @@ CQL::Executor = Struct.new(:collector, :pattern, :path, :filters) do
         walk(child, ancestors.dup + [node], source_reader)
       end
     else
-      collector.add(CQL::Crumb.new(node, ancestors, source_reader)) if match_with(node)
+      if match?(node) && CQL::FilterEvaluator.pass?(filter_reader, node, ancestors)
+        collector.add(CQL::Crumb.new(node, ancestors, source_reader))
+      end
     end
 
     nil
   end
 
-  def match_with(target)
+  def match?(target)
+    # TODO make it partial and regex
     target.to_s == pattern
   end
 

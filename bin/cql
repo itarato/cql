@@ -21,6 +21,7 @@ def show_help
   HELP
 end
 
+# @return [Hash{Symbol->Boolean}]
 def extract_options
   options = {
     show_color: true,
@@ -49,18 +50,23 @@ def extract_options
   options
 end
 
+# @return [Array]
 def extract_filters
-  []
+  ARGV.take(ARGV.size)
 end
 
 begin
-  filters = extract_filters
   options = extract_options
 
   raise unless ARGV.size >= 2
 
   pattern = ARGV.shift
+  # TODO Make path patterns universal.
   path = ARGV.shift
+
+  # Rest must be filters - can sink ARGV now.
+  filters = extract_filters
+  filter_reader = CQL::FilterReader.new(filters)
 
   printer = CQL::ConsolePrinter.new
   printer.color_on = options[:show_color]
@@ -68,7 +74,7 @@ begin
   printer.source_on = options[:show_source]
 
   collector = CQL::CrumbCollector.new(printer)
-  CQL::Executor.new(collector, pattern, path, filters).search_all
+  CQL::Executor.new(collector, filter_reader, pattern, path, filters).search_all
 rescue => e
   puts "Error: #{e}"
   show_help
