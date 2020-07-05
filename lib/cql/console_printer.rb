@@ -21,7 +21,7 @@ module CQL
     # @param crumb [CQL::Crumb]
     #
     def print(crumb)
-      puts "#{color(94)}#{crumb.file_name}#{decor_reset}:#{color(33)}#{crumb.line_no}#{decor_reset}" if @file_on
+      puts "#{color(94)}#{crumb.file_name}#{decor_reset}:#{color(33)}#{crumb.line_no}#{decor_reset} #{color(93)}#{crumb.type}#{decor_reset}" if @file_on
       puts decorate_source_line(crumb) if @source_on
     end
 
@@ -54,6 +54,7 @@ module CQL
     # @param [CQL::Crumb] crumb
     # @return [String]
     def decorate_source_line(crumb)
+      # TODO add +- line surrounding options
       source = crumb.source
       from = crumb.line_col_no
       to = from + crumb.expression_size

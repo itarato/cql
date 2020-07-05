@@ -11,14 +11,19 @@ def show_help
     \tDESCRIPTION
     \tCQL (Code Query Language) is a semantic search tool for your Ruby source code.
 
+    \tFILTERS
+    \t\tParent node type: type:T(,T)*
+
     \tOPTIONS
     \t\t-nc (--no-color) No color on output.
     \t\t-nf (--no-file) No file names.
     \t\t-ns (--no-source) No source code.
 
     \tEXAMPLES
-    \tcql update_user_info ./
+    \tcql -ns update_user_info ./ type:send,arg
   HELP
+
+  exit
 end
 
 # @return [Hash{Symbol->Boolean}]
@@ -37,6 +42,8 @@ def extract_options
         options[:show_file] = false
       elsif %w[-ns --no-source].include?(arg)
         options[:show_source] = false
+      elsif %w[-h --help]
+        show_help
       else
         raise "Unknown arg #{arg}"
       end

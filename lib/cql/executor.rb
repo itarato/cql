@@ -28,7 +28,7 @@ CQL::Executor = Struct.new(:collector, :filter_reader, :pattern, :path, :filters
   end
 
   def walk(node, ancestors, source_reader)
-    if node.is_a?(::Parser::AST::Node)
+    if node.is_a?(Parser::AST::Node)
       node.children.flat_map do |child|
         walk(child, ancestors.dup + [node], source_reader)
       end
@@ -70,6 +70,10 @@ CQL::Crumb = Struct.new(:full_name, :ancestors, :source_reader) do
 
   def expression_size
     ancestors.last.location.expression.size
+  end
+
+  def type
+    ancestors.last.type
   end
 end
 
