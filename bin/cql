@@ -6,26 +6,67 @@ def show_help
   puts <<~HELP
         
     \tSYNOPSIS
-    \tcql pattern path filters ...
+    \tcql options pattern path filters ...
 
     \tDESCRIPTION
     \tCQL (Code Query Language) is a semantic search tool for your Ruby source code.
+
+    \tOPTIONS
+    \t\t-nc (--no-color) No color on output.
+    \t\t-nf (--no-file) No file names.
+    \t\t-ns (--no-source) No source code.
 
     \tEXAMPLES
     \tcql update_user_info ./
   HELP
 end
 
+def extract_options
+  options = {
+    show_color: true,
+    show_file: true,
+    show_source: true,
+  }
+
+  ARGV.delete_if do |arg|
+    if arg[0] == '-'
+      if %w[-nc --no-color].include?(arg)
+        options[:show_color] = false
+      elsif %w[-nf --no-file].include?(arg)
+        options[:show_file] = false
+      elsif %w[-ns --no-source].include?(arg)
+        options[:show_source] = false
+      else
+        raise "Unknown arg #{arg}"
+      end
+
+      true
+    else
+      false
+    end
+  end
+
+  options
+end
+
+def extract_filters
+  []
+end
+
 begin
+  filters = extract_filters
+  options = extract_options
+
   raise unless ARGV.size >= 2
 
-  # TODO: validate
   pattern = ARGV.shift
   path = ARGV.shift
-  filters = ARGV
 
-  # Make it a streamed pipe.
   printer = CQL::ConsolePrinter.new
+  printer.color_on = options[:show_color]
+  printer.file_on = options[:show_file]
+  printer.source_on = options[:show_source]
+
   collector = CQL::CrumbCollector.new(printer)
   CQL::Executor.new(collector, pattern, path, filters).search_all
 rescue => e

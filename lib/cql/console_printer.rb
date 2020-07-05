@@ -5,19 +5,55 @@ module CQL
   # Prints to console.
   #
   class ConsolePrinter < ::CQL::AbstractPrinter
+    attr_writer :color_on
+    attr_writer :file_on
+    attr_writer :source_on
+
+    def initialize
+      super
+
+      @color_on = true
+      @file_on = true
+      @source_on = true
+    end
+
     #
     # @param crumb [CQL::Crumb]
     #
     def print(crumb)
-      puts "\e[94m#{crumb.file_name}\e[0m:\e[33m#{crumb.line_no}\e[0m"
-      puts colorize_source_line(crumb)
+      puts "#{color(94)}#{crumb.file_name}#{decor_reset}:#{color(33)}#{crumb.line_no}#{decor_reset}" if @file_on
+      puts decorate_source_line(crumb) if @source_on
     end
 
     private
 
+    def color(code)
+      if @color_on
+        "\e[#{code}m"
+      else
+        ''
+      end
+    end
+
+    def bold
+      if @color_on
+        "\e[1m"
+      else
+        ''
+      end
+    end
+
+    def decor_reset
+      if @color_on
+        "\e[0m"
+      else
+        ''
+      end
+    end
+
     # @param [CQL::Crumb] crumb
     # @return [String]
-    def colorize_source_line(crumb)
+    def decorate_source_line(crumb)
       source = crumb.source
       from = crumb.line_col_no
       to = from + crumb.expression_size
@@ -26,7 +62,16 @@ module CQL
       subject = source[from..to - 1] || ''
       suffix = source[to..] || ''
 
-      "\e[90m" + prefix + "\e[0m\e[31m\e[1m" + subject + "\e[0m\e[90m" + suffix + "\e[0m"
+      color(90) +
+        prefix +
+        decor_reset +
+        color(31) +
+        bold +
+        subject +
+        decor_reset +
+        color(90) +
+        suffix +
+        decor_reset
     end
   end
 end
