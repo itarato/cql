@@ -3,45 +3,32 @@
 require 'cql'
 
 def show_help
-    puts <<~HELP
+  puts <<~HELP
+        
+    \tSYNOPSIS
+    \tcql pattern path filters ...
 
-        \tSYNOPSIS
-        \tcql pattern path filters ...
+    \tDESCRIPTION
+    \tCQL (Code Query Language) is a semantic search tool for your Ruby source code.
 
-        \tDESCRIPTION
-        \tCQL (Code Query Language) is a semantic search tool for your Ruby source code.
-
-        \tEXAMPLES
-        \tcql update_user_info ./
-    HELP
-end
-
-def colorize_source_line(crumb)
-    source = crumb.source
-    from = crumb.line_col_no
-    to = from + crumb.expression_size
-
-    prefix = source[0..from - 1]
-    subject = source[from..to - 1]
-    suffix = source[to..]
-
-    "\e[90m" + prefix + "\e[0m\e[31m\e[1m" + subject + "\e[0m\e[90m" + suffix + "\e[0m"
+    \tEXAMPLES
+    \tcql update_user_info ./
+  HELP
 end
 
 begin
-    raise unless ARGV.size >= 2
+  raise unless ARGV.size >= 2
 
-    # TODO: validate
-    pattern = ARGV.shift
-    path = ARGV.shift
-    filters = ARGV
+  # TODO: validate
+  pattern = ARGV.shift
+  path = ARGV.shift
+  filters = ARGV
 
-    # Make it a streamed pipe.
-    CQL::Executor.new(pattern, path, filters).search_all.map do |crumb|
-        puts "\e[94m#{crumb.file_name}\e[0m:\e[33m#{crumb.line_no}\e[0m"
-        puts colorize_source_line(crumb)
-    end
+  # Make it a streamed pipe.
+  printer = CQL::ConsolePrinter.new
+  collector = CQL::CrumbCollector.new(printer)
+  CQL::Executor.new(collector, pattern, path, filters).search_all
 rescue => e
-    puts "Error: #{e}"
-    show_help
+  puts "Error: #{e}"
+  show_help
 end
