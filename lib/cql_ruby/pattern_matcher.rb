@@ -28,6 +28,7 @@ module CqlRuby
       pattern = pattern[2..]
       pattern, *mods = pattern.split('+')
 
+      # TODO Fix the modifier definition -> + can be part of regex
       fops = 0
       fops |= Regexp::IGNORECASE if mods.include?('i')
       fops |= Regexp::MULTILINE if mods.include?('m')

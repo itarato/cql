@@ -12,7 +12,8 @@ def show_help
     \t\tCQL (Code Query Language) is a semantic search tool for your Ruby source code.
 
     \tFILTERS
-    \t\tParent node type: type:T(,T)*
+    \t\tParent node type: type:T(,T)* Example: type:def,send,arg
+    \t\tNesting under: nest:T(=NAME) Example: nest:def=save_user nest:class=UserManager
 
     \tOPTIONS
     \t\t-nc (--no-color) No color on output.
