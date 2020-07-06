@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module CQL
+module CqlRuby
   class NestRule < Struct.new(:type, :name)
     NAME_ANY = '*'
     ALLOWED_TYPE = %w[class module def block].freeze
@@ -40,7 +40,7 @@ module CQL
   class FilterReader
     # @attribute [Parser::AST::Node] allowed_types
     attr_reader :allowed_types
-    # @attribute [Array<CQL::NestRule>] nest_under
+    # @attribute [Array<Cqlruby::NestRule>] nest_under
     attr_reader :nest_under
 
     def initialize(raw_filters)

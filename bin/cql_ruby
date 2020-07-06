@@ -1,15 +1,15 @@
 #!/usr/bin/env ruby
 
-require 'cql'
+require 'cql_ruby'
 
 def show_help
   puts <<~HELP
         
     \tSYNOPSIS
-    \tcql options pattern path filters ...
+    \t\tcql_ruby options pattern path filters ...
 
     \tDESCRIPTION
-    \tCQL (Code Query Language) is a semantic search tool for your Ruby source code.
+    \t\tCQL (Code Query Language) is a semantic search tool for your Ruby source code.
 
     \tFILTERS
     \t\tParent node type: type:T(,T)*
@@ -20,7 +20,7 @@ def show_help
     \t\t-ns (--no-source) No source code.
 
     \tEXAMPLES
-    \tcql -ns update_user_info ./ type:send,arg
+    \t\tcql_ruby -ns update_user_info ./ type:send,arg
   HELP
 
   exit
@@ -73,15 +73,15 @@ begin
 
   # Rest must be filters - can sink ARGV now.
   filters = extract_filters
-  filter_reader = CQL::FilterReader.new(filters)
+  filter_reader = CqlRuby::FilterReader.new(filters)
 
-  printer = CQL::ConsolePrinter.new
+  printer = CqlRuby::ConsolePrinter.new
   printer.color_on = options[:show_color]
   printer.file_on = options[:show_file]
   printer.source_on = options[:show_source]
 
-  collector = CQL::CrumbCollector.new(printer)
-  CQL::Executor.new(collector, filter_reader, pattern, path, filters).search_all
+  collector = CqlRuby::CrumbCollector.new(printer)
+  CqlRuby::Executor.new(collector, filter_reader, pattern, path, filters).search_all
 rescue => e
   puts "Error: #{e}"
   show_help

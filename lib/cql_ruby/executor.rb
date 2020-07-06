@@ -5,12 +5,12 @@ require 'parser/current'
 #
 # Executes search and dumps results into the collector.
 #
-# @param collector [CQL::CrumbCollector]
+# @param collector [Cqlruby::CrumbCollector]
 # @param pattern [String]
 # @param path [String]
 # @param filters [Array<String>]
 #
-CQL::Executor = Struct.new(:collector, :filter_reader, :pattern, :path, :filters) do
+CqlRuby::Executor = Struct.new(:collector, :filter_reader, :pattern, :path, :filters) do
   def search_all
     files.flat_map do |file|
       search(file)
@@ -21,7 +21,7 @@ CQL::Executor = Struct.new(:collector, :filter_reader, :pattern, :path, :filters
 
   def search(file)
     ast = Parser::CurrentRuby.parse(File.read(file))
-    source_reader = CQL::SourceReader.new(file)
+    source_reader = CqlRuby::SourceReader.new(file)
     walk(ast, [], source_reader)
 
     nil
@@ -33,8 +33,8 @@ CQL::Executor = Struct.new(:collector, :filter_reader, :pattern, :path, :filters
         walk(child, ancestors.dup + [node], source_reader)
       end
     else
-      if match?(node) && CQL::FilterEvaluator.pass?(filter_reader, node, ancestors)
-        collector.add(CQL::Crumb.new(node, ancestors, source_reader))
+      if match?(node) && CqlRuby::FilterEvaluator.pass?(filter_reader, node, ancestors)
+        collector.add(CqlRuby::Crumb.new(node, ancestors, source_reader))
       end
     end
 
@@ -42,8 +42,7 @@ CQL::Executor = Struct.new(:collector, :filter_reader, :pattern, :path, :filters
   end
 
   def match?(target)
-    # TODO make it partial and regex
-    target.to_s == pattern
+    CqlRuby::PatternMatcher.match?(pattern, target)
   end
 
   def files
@@ -51,7 +50,7 @@ CQL::Executor = Struct.new(:collector, :filter_reader, :pattern, :path, :filters
   end
 end
 
-CQL::Crumb = Struct.new(:full_name, :ancestors, :source_reader) do
+CqlRuby::Crumb = Struct.new(:full_name, :ancestors, :source_reader) do
   def line_no
     ancestors.last.location.expression.line
   end
@@ -77,7 +76,7 @@ CQL::Crumb = Struct.new(:full_name, :ancestors, :source_reader) do
   end
 end
 
-CQL::SourceReader = Struct.new(:file) do
+CqlRuby::SourceReader = Struct.new(:file) do
   def initialize(*args)
     super
   end

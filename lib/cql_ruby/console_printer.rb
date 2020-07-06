@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-module CQL
+module CqlRuby
   #
   # Prints to console.
   #
-  class ConsolePrinter < ::CQL::AbstractPrinter
+  class ConsolePrinter < ::CqlRuby::AbstractPrinter
     attr_writer :color_on
     attr_writer :file_on
     attr_writer :source_on
@@ -18,7 +18,7 @@ module CQL
     end
 
     #
-    # @param crumb [CQL::Crumb]
+    # @param crumb [Cqlruby::Crumb]
     #
     def print(crumb)
       puts "#{color(94)}#{crumb.file_name}#{decor_reset}:#{color(33)}#{crumb.line_no}#{decor_reset} #{color(93)}#{crumb.type}#{decor_reset}" if @file_on
@@ -51,7 +51,7 @@ module CQL
       end
     end
 
-    # @param [CQL::Crumb] crumb
+    # @param [Cqlruby::Crumb] crumb
     # @return [String]
     def decorate_source_line(crumb)
       # TODO add +- line surrounding options

@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-module CQL
+module CqlRuby
   class CrumbCollector
     #
-    # @param printer [CQL::AbstractPrinter]
+    # @param printer [Cqlruby::AbstractPrinter]
     #
     def initialize(printer)
       super()

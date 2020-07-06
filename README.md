@@ -19,6 +19,10 @@ cql PATTERN PATH
 
 `cql --help` for more info.
 
+Text matching both for the main pattern and any patterns in filters allows 3 different matching strategies:
+
+- regex: `r:REGEX(+MODIFIER)*` where modifier is: i/m/x/f/n, example: `r:user_\d+` <- FIX THIS 
+
 ## Filters:
 
 ### Type

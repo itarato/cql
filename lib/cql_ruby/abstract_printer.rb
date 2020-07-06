@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-module CQL
+module CqlRuby
   #
-  # Printing CQL::Crumb-s.
+  # Printing Cqlruby::Crumb-s.
   #
   class AbstractPrinter
     def print(_crumb)

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module CQL
+module CqlRuby
   class FilterEvaluator
     class << self
       def pass?(filter_reader, node, ancestors)
@@ -13,7 +13,7 @@ module CQL
       private
 
       #
-      # @param [CQL::FilterReader] filter_reader
+      # @param [Cqlruby::FilterReader] filter_reader
       # @param [Array<Parser::AST::Node>] ancestors
       #
       # @return [Boolean]
@@ -25,7 +25,7 @@ module CQL
       end
 
       #
-      # @param [CQL::FilterReader] filter_reader
+      # @param [Cqlruby::FilterReader] filter_reader
       # @param [Array<Parser::AST::Node>] ancestors
       #
       # @return [Boolean]
@@ -40,9 +40,9 @@ module CQL
 
             # TODO Make a proper matcher class.
             if %w[class module].include?(nest_rule.type)
-              ancestor.children[0].children[1].to_s == nest_rule.name
+              CqlRuby::PatternMatcher.match?(nest_rule.name, ancestor.children[0].children[1])
             elsif %[def].include?(nest_rule.type)
-              ancestor.children[0].to_s == nest_rule.name
+              CqlRuby::PatternMatcher.match?(nest_rule.name, ancestor.children[0])
             else
               raise 'Unknown type.'
             end
