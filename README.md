@@ -8,7 +8,7 @@ Code Query Language is a command line semantic code search tool for Ruby. This i
 ## Install:
 
 ```bash
-gem install cql
+gem install cql_ruby
 ```
 
 ## Usage:
@@ -17,7 +17,7 @@ gem install cql
 cql PATTERN PATH
 ```
 
-`cql --help` for more info.
+`cql_ruby --help` for more info.
 
 Text matching both for the main pattern and any patterns in filters allows 3 different matching strategies:
 
@@ -31,7 +31,7 @@ Comma separated list of (parent node) types.
 
 Example:
 
-`cql foo ./ type:send,arg`
+`cql_ruby foo ./ type:send,arg`
 
 Available types: https://github.com/whitequark/parser/blob/master/lib/parser/meta.rb#L11-L34
  
@@ -41,6 +41,6 @@ Under what structure the subject is nested.
 
 Example:
 
-`cql foo ./ nest:class=User`
+`cql_ruby foo ./ nest:class=User`
 
 Accepted nest structures: class, module, def, block
