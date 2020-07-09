@@ -33,6 +33,7 @@ def extract_options
     show_color: true,
     show_file: true,
     show_source: true,
+    recursive_search: true,
   }
 
   ARGV.delete_if do |arg|
@@ -48,6 +49,8 @@ def extract_options
       elsif %w[-v -vv -vvv].include?(arg)
         lvl = arg.chars.find_all { |c| c == 'v' }.size
         CqlRuby::Config.debug_level = lvl
+      elsif %w[-nr --no-recursive].include?(arg)
+        options[:recursive_search] = false
       else
         raise "Unknown arg #{arg}"
       end
@@ -91,7 +94,14 @@ begin
   printer.source_on = options[:show_source]
 
   collector = CqlRuby::CrumbCollector.new(printer)
-  CqlRuby::Executor.new(collector, filter_reader, pattern, path, filters).search_all
+  CqlRuby::Executor.new(
+    collector: collector,
+    filter_reader: filter_reader,
+    pattern: pattern,
+    path: path,
+    filters: filters,
+    recursive: options[:recursive_search],
+  ).search_all
 rescue => e
   puts "Error: #{e}"
   show_help

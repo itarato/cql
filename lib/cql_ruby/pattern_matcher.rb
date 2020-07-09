@@ -15,7 +15,7 @@ module CqlRuby
     end
 
     def self.regex?(pattern)
-      pattern[0..1] == 'r:'
+      pattern[0..1] == 'r/'
     end
     private_class_method :regex?
 
@@ -26,9 +26,10 @@ module CqlRuby
 
     def self.regex_match?(pattern, subject)
       pattern = pattern[2..]
-      pattern, *mods = pattern.split('+')
+      delim_idx = pattern.rindex('/')
+      mods = pattern[delim_idx + 1..].chars
+      pattern = pattern[0..delim_idx - 1]
 
-      # TODO Fix the modifier definition -> + can be part of regex
       fops = 0
       fops |= Regexp::IGNORECASE if mods.include?('i')
       fops |= Regexp::MULTILINE if mods.include?('m')

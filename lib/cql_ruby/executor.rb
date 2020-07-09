@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'parser/current'
-# require 'singleton'
+require 'pathname'
 
 module CqlRuby
   class Config
@@ -25,44 +25,75 @@ end
 # @param path [String]
 # @param filters [Array<String>]
 #
-CqlRuby::Executor = Struct.new(:collector, :filter_reader, :pattern, :path, :filters) do
-  def search_all
-    files.flat_map do |file|
-      CqlRuby.log "File check: #{file}" if CqlRuby::Config.debug_level_3?
-      search(file)
+module CqlRuby
+  class Executor
+    def initialize(
+      collector:,
+      filter_reader:,
+      pattern:,
+      path:,
+      filters: [],
+      recursive: true
+    )
+      @collector = collector
+      @filter_reader = filter_reader
+      @pattern = pattern
+      @path = path
+      @filters = filters
+      @recursive = recursive
     end
-  end
 
-  private
-
-  def search(file)
-    ast = Parser::CurrentRuby.parse(File.read(file))
-    source_reader = CqlRuby::SourceReader.new(file)
-    walk(ast, [], source_reader)
-
-    nil
-  end
-
-  def walk(node, ancestors, source_reader)
-    if node.is_a?(Parser::AST::Node)
-      node.children.flat_map do |child|
-        walk(child, ancestors.dup + [node], source_reader)
-      end
-    else
-      if match?(node) && CqlRuby::FilterEvaluator.pass?(filter_reader, node, ancestors)
-        collector.add(CqlRuby::Crumb.new(node, ancestors, source_reader))
+    def search_all
+      files.flat_map do |file|
+        CqlRuby.log "File check: #{file}" if CqlRuby::Config.debug_level_3?
+        search(file)
       end
     end
 
-    nil
-  end
+    private
 
-  def match?(target)
-    CqlRuby::PatternMatcher.match?(pattern, target)
-  end
+    def search(file)
+      ast = Parser::CurrentRuby.parse(File.read(file))
+      source_reader = CqlRuby::SourceReader.new(file)
+      walk(ast, [], source_reader)
 
-  def files
-    Dir.glob(path)
+      nil
+    end
+
+    def walk(node, ancestors, source_reader)
+      if node.is_a?(Parser::AST::Node)
+        node.children.flat_map do |child|
+          walk(child, ancestors.dup + [node], source_reader)
+        end
+      else
+        if match?(node) && CqlRuby::FilterEvaluator.pass?(filter_reader, node, ancestors)
+          collector.add(CqlRuby::Crumb.new(node, ancestors, source_reader))
+        end
+      end
+
+      nil
+    end
+
+    def match?(target)
+      CqlRuby::PatternMatcher.match?(pattern, target)
+    end
+
+    def files
+      return [path] if File.file?(path)
+
+      clean_path = Pathname(path).cleanpath.to_s
+      clean_path += '/**' if recursive
+      clean_path += '/*.rb'
+
+      Dir.glob(clean_path)
+    end
+
+    attr_reader :collector
+    attr_reader :filter_reader
+    attr_reader :pattern
+    attr_reader :path
+    attr_reader :filters
+    attr_reader :recursive
   end
 end
 
