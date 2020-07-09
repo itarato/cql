@@ -43,8 +43,11 @@ def extract_options
         options[:show_file] = false
       elsif %w[-ns --no-source].include?(arg)
         options[:show_source] = false
-      elsif %w[-h --help]
+      elsif %w[-h --help].include?(arg)
         show_help
+      elsif %w[-v -vv -vvv].include?(arg)
+        lvl = arg.chars.find_all { |c| c == 'v' }.size
+        CqlRuby::Config.debug_level = lvl
       else
         raise "Unknown arg #{arg}"
       end
@@ -65,15 +68,21 @@ end
 
 begin
   options = extract_options
+  CqlRuby.log "Call options: #{options}" if CqlRuby::Config.debug_level_2?
 
   raise unless ARGV.size >= 2
 
   pattern = ARGV.shift
+  CqlRuby.log "Call pattern: <#{pattern}>" if CqlRuby::Config.debug_level_2?
+
   # TODO Make path patterns universal.
   path = ARGV.shift
+  CqlRuby.log "Call path: <#{path}>" if CqlRuby::Config.debug_level_2?
 
   # Rest must be filters - can sink ARGV now.
   filters = extract_filters
+  CqlRuby.log "Call filters: #{filters}" if CqlRuby::Config.debug_level_2?
+
   filter_reader = CqlRuby::FilterReader.new(filters)
 
   printer = CqlRuby::ConsolePrinter.new

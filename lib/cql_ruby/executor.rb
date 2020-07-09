@@ -1,6 +1,21 @@
 # frozen_string_literal: true
 
 require 'parser/current'
+# require 'singleton'
+
+module CqlRuby
+  class Config
+    @@debug_level = 0
+
+    class << self
+      def debug_level=(lvl); @@debug_level = lvl; end
+      def debug_level; @@debug_level; end
+      def debug_level_1?; @@debug_level >= 1; end
+      def debug_level_2?; @@debug_level >= 2; end
+      def debug_level_3?; @@debug_level >= 3; end
+    end
+  end
+end
 
 #
 # Executes search and dumps results into the collector.
@@ -13,6 +28,7 @@ require 'parser/current'
 CqlRuby::Executor = Struct.new(:collector, :filter_reader, :pattern, :path, :filters) do
   def search_all
     files.flat_map do |file|
+      CqlRuby.log "File check: #{file}" if CqlRuby::Config.debug_level_3?
       search(file)
     end
   end

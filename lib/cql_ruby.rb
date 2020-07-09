@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
-module CqlRuby; end
+module CqlRuby;
+  def self.log(txt)
+    p txt
+  end
+end
 
 require 'cql_ruby/executor'
 require 'cql_ruby/crumb_collector'
