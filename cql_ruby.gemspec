@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name = 'cql_ruby'
   s.summary = 'Code Query Language for Ruby'
-  s.version = '0.0.5'
+  s.version = '0.0.6'
   s.required_ruby_version = '>= 2.5.0'
   s.date = '2020-07-05'
   s.files = [

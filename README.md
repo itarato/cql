@@ -5,6 +5,8 @@ CQL
 
 Code Query Language is a command line semantic code search tool for Ruby. This is not a replacement to Grep as it so
 
+![Screenshot](assets/screenshot.png)
+
 ## Install:
 
 ```bash
@@ -22,6 +24,8 @@ cql PATTERN PATH
 Text matching both for the main pattern and any patterns in filters allows 3 different matching strategies:
 
 - regex: `r/REGEX/(MODIFIER)*` where modifier is: i/m/x/f/n, example: `r/user_\d+/i` 
+- partial string match: `%PATTERN`, example: `%user`
+- perfect string match: `PATTERN`, example: `user`
 
 ## Filters:
 
