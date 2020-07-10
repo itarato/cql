@@ -8,6 +8,7 @@ module CqlRuby
     attr_writer :color_on
     attr_writer :file_on
     attr_writer :source_on
+    attr_writer :surrounding_lines
 
     def initialize
       super
@@ -15,14 +16,33 @@ module CqlRuby
       @color_on = true
       @file_on = true
       @source_on = true
+      @surrounding_lines = 0
+      @counter = 0
     end
 
     #
     # @param crumb [Cqlruby::Crumb]
     #
     def print(crumb)
-      puts "#{color(94)}#{crumb.file_name}#{decor_reset}:#{color(33)}#{crumb.line_no}#{decor_reset} #{color(93)}#{crumb.type}#{decor_reset}" if @file_on
-      puts decorate_source_line(crumb) if @source_on
+      parts = "##{color(97)}#{@counter}#{decor_reset}"
+      parts += " #{color(94)}#{crumb.file_name}#{decor_reset}:#{color(33)}#{crumb.line_no}#{decor_reset} #{color(93)}#{crumb.type}#{decor_reset}" if @file_on
+
+      if @source_on && @surrounding_lines.positive?
+        parts_visible_len = parts.gsub(/\e\[\d+m/, '').size + 1
+        indent = ' ' * parts_visible_len
+        (-@surrounding_lines).upto(-1).each { |offs| puts "#{indent}#{crumb.surrounding_line(offs)}" }
+      end
+
+      parts += ' ' + decorate_source_line(crumb) if @source_on
+
+      puts parts
+
+      if @source_on && @surrounding_lines.positive?
+        1.upto(@surrounding_lines).each { |offs| puts "#{indent}#{crumb.surrounding_line(offs)}" }
+        puts '--'
+      end
+
+      @counter += 1
     end
 
     private
@@ -54,7 +74,6 @@ module CqlRuby
     # @param [Cqlruby::Crumb] crumb
     # @return [String]
     def decorate_source_line(crumb)
-      # TODO add +- line surrounding options
       source = crumb.source
       from = crumb.line_col_no
       to = from + crumb.expression_size
@@ -63,14 +82,14 @@ module CqlRuby
       subject = source[from..to - 1] || ''
       suffix = source[to..] || ''
 
-      color(90) +
+      color(97) +
         prefix +
         decor_reset +
         color(31) +
         bold +
         subject +
         decor_reset +
-        color(90) +
+        color(97) +
         suffix +
         decor_reset
     end

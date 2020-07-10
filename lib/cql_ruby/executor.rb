@@ -112,6 +112,10 @@ CqlRuby::Crumb = Struct.new(:full_name, :ancestors, :source_reader) do
     source_reader.source_line(line_no)
   end
 
+  def surrounding_line(offset)
+    source_reader.source_line(line_no + offset)
+  end
+
   def file_name
     source_reader.file
   end
@@ -131,6 +135,8 @@ CqlRuby::SourceReader = Struct.new(:file) do
   end
 
   def source_line(n)
+    return nil unless lines.size >= n
+
     lines[n - 1].chop
   end
 

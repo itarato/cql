@@ -16,6 +16,7 @@ def show_help
     \t\tNesting under: nest:T(=NAME) Example: nest:def=save_user nest:class=UserManager
 
     \tOPTIONS
+    \t\t-lN (N is integer) Add N surrounding line before and after.
     \t\t-nc (--no-color) No color on output.
     \t\t-nf (--no-file) No file names.
     \t\t-ns (--no-source) No source code.
@@ -37,6 +38,7 @@ def extract_options
     show_file: true,
     show_source: true,
     recursive_search: true,
+    surrounding_lines: 0,
   }
 
   ARGV.delete_if do |arg|
@@ -54,6 +56,8 @@ def extract_options
         CqlRuby::Config.debug_level = lvl
       elsif %w[-nr --no-recursive].include?(arg)
         options[:recursive_search] = false
+      elsif arg[0..1] == '-l' && arg[2..].to_i > 0
+        options[:surrounding_lines] = arg[2..].to_i
       else
         raise "Unknown arg #{arg}"
       end
@@ -95,6 +99,7 @@ begin
   printer.color_on = options[:show_color]
   printer.file_on = options[:show_file]
   printer.source_on = options[:show_source]
+  printer.surrounding_lines = options[:surrounding_lines]
 
   collector = CqlRuby::CrumbCollector.new(printer)
   CqlRuby::Executor.new(
