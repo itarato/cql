@@ -19,9 +19,12 @@ def show_help
     \t\t-nc (--no-color) No color on output.
     \t\t-nf (--no-file) No file names.
     \t\t-ns (--no-source) No source code.
+    \t\t-nr (--no-recursion) Non-recursive search.
+    \t\t-v -vv -vvv Debug output levels.
 
     \tEXAMPLES
-    \t\tcql_ruby -ns update_user_info ./ type:send,arg
+    \t\tcql_ruby user ./
+    \t\tcql_ruby -ns -nr %user_info ./ type:send,arg nest:block nest:class=r/User/i
   HELP
 
   exit

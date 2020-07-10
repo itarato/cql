@@ -21,7 +21,7 @@ cql PATTERN PATH
 
 Text matching both for the main pattern and any patterns in filters allows 3 different matching strategies:
 
-- regex: `r:REGEX(+MODIFIER)*` where modifier is: i/m/x/f/n, example: `r:user_\d+` <- FIX THIS 
+- regex: `r/REGEX/(MODIFIER)*` where modifier is: i/m/x/f/n, example: `r/user_\d+/i` 
 
 ## Filters:
 
@@ -39,8 +39,9 @@ Available types: https://github.com/whitequark/parser/blob/master/lib/parser/met
 
 Under what structure the subject is nested.
 
-Example:
+Examples:
 
-`cql_ruby foo ./ nest:class=User`
+- `cql_ruby foo ./ nest:class=User`
+- `cql_ruby bar ./ nest:block`
 
 Accepted nest structures: class, module, def, block

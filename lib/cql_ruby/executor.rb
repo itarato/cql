@@ -58,6 +58,8 @@ module CqlRuby
       walk(ast, [], source_reader)
 
       nil
+    rescue => e
+      CqlRuby.log "File #{file} cannot be parsed: #{e}"
     end
 
     def walk(node, ancestors, source_reader)
