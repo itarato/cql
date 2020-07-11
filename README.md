@@ -3,6 +3,8 @@ CQL
 
 ![Logo](assets/cql_logo_small.png)
 
+[![Gem Version](https://badge.fury.io/rb/cql_ruby.svg)](https://badge.fury.io/rb/cql_ruby)
+
 Code Query Language is a command line semantic code search tool for Ruby. This is not a replacement to Grep as it is only looking for AST leaf tokens in the source code (no comments and concatenation of tokens). Leaf tokens are variables, arguments, constants, operators, etc.
 
 Why? Because sometimes you just want to know where something is used or called from. Maybe you're debugging a giant legacy codebase and wonder who is using a class or where a hash key might originate from.
