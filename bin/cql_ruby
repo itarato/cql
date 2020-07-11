@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 
+require 'parser'
 require 'cql_ruby'
 
 def show_help
@@ -14,6 +15,7 @@ def show_help
     \tFILTERS
     \t\tParent node type: type:T(,T)* Example: type:def,send,arg
     \t\tNesting under: nest:T(=NAME) Example: nest:def=save_user nest:class=UserManager
+    \t\tHas child: has:T(=NAME) Example: has:const has:def=valid?
 
     \tOPTIONS
     \t\t-lN (N is integer) Add N surrounding line before and after.
@@ -23,9 +25,13 @@ def show_help
     \t\t-nr (--no-recursion) Non-recursive search.
     \t\t-v -vv -vvv Debug output levels.
 
+    \tALLOWED NODE TYPES
+    \t\tWhen defining filters only valid AST types can be defined. They are:
+    #{Parser::Meta::NODE_TYPES.to_a.join(' ')}
+
     \tEXAMPLES
     \t\tcql_ruby user ./
-    \t\tcql_ruby -ns -nr %user_info ./ type:send,arg nest:block nest:class=r/User/i
+    \t\tcql_ruby -ns -nr %user_info ./ type:send,arg nest:block nest:class=r/User/i has:str=WARNING
   HELP
 
   exit

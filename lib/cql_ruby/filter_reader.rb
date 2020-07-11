@@ -1,9 +1,11 @@
 # frozen_string_literal: true
 
+# TODO: Have convenience filters for type:_ such as: isclass, ismodule, isdef ...
+
 module CqlRuby
-  class NestRule < Struct.new(:type, :name)
+  class NodeSpec < Struct.new(:type, :name)
+    # Make this non duplicated.
     NAME_ANY = '*'
-    ALLOWED_TYPE = %w[class module def block].freeze
 
     class << self
       #
@@ -15,8 +17,7 @@ module CqlRuby
         type, name = raw_value.split('=')
         name ||= NAME_ANY
 
-        raise "Unknown type: #{type}. Allowed: #{ALLOWED_TYPE}" unless ALLOWED_TYPE.include?(type)
-        raise "Type #{type} cannot have a name." if %w[block].include?(type) && name != NAME_ANY
+        raise "Type '#{type}' is not recognized. See 'cql_ruby --help' for allowed types." unless Parser::Meta::NODE_TYPES.member?(type.to_sym)
 
         new(type, name)
       end
@@ -38,16 +39,21 @@ module CqlRuby
   # example: type:def,send
   #
   class FilterReader
-    # @attribute [Parser::AST::Node] allowed_types
+    NESTING_ALLOWED_TYPES = %w[class module def block].freeze
+
+    # @attribute [Array<Symbol>] allowed_types
     attr_reader :allowed_types
-    # @attribute [Array<Cqlruby::NestRule>] nest_under
+    # @attribute [Array<CqlRuby::NodeSpec>] nest_under
     attr_reader :nest_under
+    # @attribute [Array<CqlRuby::NodeSpec>] has_leaves
+    attr_reader :has_leaves
 
     def initialize(raw_filters)
       super()
 
       @allowed_types = []
       @nest_under = []
+      @has_leaves = []
 
       parse_raw_filters(raw_filters)
     end
@@ -58,6 +64,10 @@ module CqlRuby
 
     def restrict_nesting?
       !@nest_under.empty?
+    end
+
+    def restrict_children?
+      !@has_leaves.empty?
     end
 
     private
@@ -71,7 +81,13 @@ module CqlRuby
         if %w[type t].include?(name)
           @allowed_types += value.split(',').map(&:to_sym)
         elsif %w[nest n].include?(name)
-          @nest_under << NestRule.from(value)
+          spec = NodeSpec.from(value)
+          raise "Unknown type for nesting: '#{spec.type}' from '#{raw_filter}'. Allowed: #{NESTING_ALLOWED_TYPES}" unless NESTING_ALLOWED_TYPES.include?(spec.type)
+          raise "Type #{spec.type} cannot have a name." if %w[block].include?(spec.type) && spec.restrict_name?
+
+          @nest_under << spec
+        elsif %w[has h].include?(name)
+          @has_leaves << NodeSpec.from(value)
         end
       end
 
