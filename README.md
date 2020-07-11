@@ -53,3 +53,12 @@ Examples:
 - `cql_ruby bar ./ nest:block`
 
 Accepted nest structures: `class`, `module`, `def`, `block`.
+
+### Has child
+
+Restrict to nodes that has a specific child.
+
+Examples:
+
+- `cql_ruby foo ./ has:def`
+- `cql_ruby foo ./ has:def=r/user_(save|edit)/i`
