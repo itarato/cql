@@ -33,7 +33,9 @@ module CqlRuby
       pattern:,
       path:,
       filters: [],
-      recursive: true
+      recursive: true,
+      include: nil,
+      exclude: nil
     )
       @collector = collector
       @filter_reader = filter_reader
@@ -41,10 +43,15 @@ module CqlRuby
       @path = path
       @filters = filters
       @recursive = recursive
+      @include = include
+      @exclude = exclude
     end
 
     def search_all
       files.flat_map do |file|
+        next if !@exclude.nil? && CqlRuby::PatternMatcher.match?(@exclude, file)
+        next unless @include.nil? || CqlRuby::PatternMatcher.match?(@include, file)
+
         CqlRuby.log "File check: #{file}" if CqlRuby::Config.debug_level_3?
         search(file)
       end
@@ -59,7 +66,8 @@ module CqlRuby
 
       nil
     rescue => e
-      CqlRuby.log "File #{file} cannot be parsed: #{e}"
+      CqlRuby.log "File #{file} cannot be parsed"
+      CqlRuby.log "Reason: #{e}" if CqlRuby::Config.debug_level_1?
     end
 
     def walk(node, ancestors, source_reader)

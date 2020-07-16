@@ -18,6 +18,8 @@ def show_help
     \t\tHas child: has:T(=NAME) Example: has:const has:def=valid?
 
     \tOPTIONS
+    \t\t--include=PATTERN Parses only files whose name matches the pattern.
+    \t\t--exclude=PATTERN Parses only files whose name does not match the pattern.
     \t\t-lN (N is integer) Add N surrounding line before and after.
     \t\t-nc (--no-color) No color on output.
     \t\t-nf (--no-file) No file names.
@@ -45,6 +47,8 @@ def extract_options
     show_source: true,
     recursive_search: true,
     surrounding_lines: 0,
+    include_pattern: nil,
+    exclude_pattern: nil,
   }
 
   ARGV.delete_if do |arg|
@@ -64,6 +68,10 @@ def extract_options
         options[:recursive_search] = false
       elsif arg[0..1] == '-l' && arg[2..].to_i > 0
         options[:surrounding_lines] = arg[2..].to_i
+      elsif arg.start_with?('--include=')
+        options[:include_pattern] = arg.split('=')[1]
+      elsif arg.start_with?('--exclude=')
+        options[:exclude_pattern] = arg.split('=')[1]
       else
         raise "Unknown arg #{arg}"
       end
@@ -91,7 +99,6 @@ begin
   pattern = ARGV.shift
   CqlRuby.log "Call pattern: <#{pattern}>" if CqlRuby::Config.debug_level_2?
 
-  # TODO Make path patterns universal.
   path = ARGV.shift
   CqlRuby.log "Call path: <#{path}>" if CqlRuby::Config.debug_level_2?
 
@@ -115,6 +122,8 @@ begin
     path: path,
     filters: filters,
     recursive: options[:recursive_search],
+    include: options[:include_pattern],
+    exclude: options[:exclude_pattern],
   ).search_all
 rescue => e
   puts "Error: #{e}"
