@@ -125,7 +125,7 @@ begin
     include: options[:include_pattern],
     exclude: options[:exclude_pattern],
   ).search_all
-rescue => e
-  puts "Error: #{e}"
+rescue
+  puts "Error: #{$!}"
   show_help
 end
