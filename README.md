@@ -13,6 +13,20 @@ This is so far a concept prototype, any feedback or feature request (and of cour
 
 ![Screenshot](assets/screenshot.png)
 
+Examples:
+
+Find all classes that subclasses ApplicationRecord and has an initializer defined:
+
+```bash
+cql_ruby ApplicationRecord ./app type:const has:def=initializer
+```
+
+Find all occurrences of any variable ending with _user that is being assigned a new value inside a block, but not in test files:
+
+```bash
+cql_ruby r/_user$/ ./app type:lvasgn nest:block --exclude=%test.rb
+```
+
 ## Install:
 
 ```bash
@@ -22,7 +36,7 @@ gem install cql_ruby
 ## Usage:
 
 ```
-cql_ruby PATTERN PATH
+cql_ruby PATTERN PATH OPTIONS FILTERS
 ```
 
 `cql_ruby --help` for more info.
@@ -43,7 +57,7 @@ Example:
 
 `cql_ruby foo ./ type:send,arg`
 
-Available types: https://github.com/whitequark/parser/blob/master/lib/parser/meta.rb#L11-L34
+Available types: https://github.com/whitequark/parser/blob/master/lib/parser/meta.rb#L11-L34 (or use `--help`).
  
 ### Nesting
 
