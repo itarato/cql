@@ -2,7 +2,7 @@
 
 module CqlRuby
   #
-  # Printing Cqlruby::Crumb-s.
+  # Printing CqlRuby::Crumb-s.
   #
   class AbstractPrinter
     def print(_crumb)

@@ -3,7 +3,7 @@
 module CqlRuby
   class CrumbCollector
     #
-    # @param printer [Cqlruby::AbstractPrinter]
+    # @param printer [CqlRuby::AbstractPrinter]
     #
     def initialize(printer)
       super()

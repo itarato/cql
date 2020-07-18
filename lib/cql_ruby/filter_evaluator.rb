@@ -14,7 +14,7 @@ module CqlRuby
       private
 
       #
-      # @param [Cqlruby::FilterReader] filter_reader
+      # @param [CqlRuby::FilterReader] filter_reader
       # @param [Array<Parser::AST::Node>] ancestors
       #
       # @return [Boolean]

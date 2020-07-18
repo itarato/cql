@@ -21,7 +21,7 @@ module CqlRuby
     end
 
     #
-    # @param crumb [Cqlruby::Crumb]
+    # @param crumb [CqlRuby::Crumb]
     #
     def print(crumb)
       parts = "##{color(97)}#{@counter}#{decor_reset}"
@@ -71,7 +71,7 @@ module CqlRuby
       end
     end
 
-    # @param [Cqlruby::Crumb] crumb
+    # @param [CqlRuby::Crumb] crumb
     # @return [String]
     def decorate_source_line(crumb)
       source = crumb.source

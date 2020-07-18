@@ -20,7 +20,7 @@ end
 #
 # Executes search and dumps results into the collector.
 #
-# @param collector [Cqlruby::CrumbCollector]
+# @param collector [CqlRuby::CrumbCollector]
 # @param pattern [String]
 # @param path [String]
 # @param filters [Array<String>]
