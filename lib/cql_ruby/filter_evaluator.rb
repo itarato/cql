@@ -3,11 +3,11 @@
 module CqlRuby
   class FilterEvaluator
     class << self
-      def pass?(filter_reader, node, ancestors)
+      def pass?(filter_reader, ancestors)
         [
           pass_type?(filter_reader, ancestors),
           pass_nesting?(filter_reader, ancestors),
-          pass_has?(filter_reader, node, ancestors),
+          pass_has?(filter_reader, ancestors),
         ].all?
       end
 
@@ -39,7 +39,6 @@ module CqlRuby
             next false unless ancestor.type.to_s == nest_rule.type
             next true unless nest_rule.restrict_name?
 
-            # TODO Make a proper matcher class.
             if %w[class module].include?(nest_rule.type)
               CqlRuby::PatternMatcher.match?(nest_rule.name, ancestor.children[0].children[1])
             elsif %[def].include?(nest_rule.type)
@@ -53,10 +52,9 @@ module CqlRuby
 
       #
       # @param [CqlRuby::FilterReader] filter_reader
-      # @param [Parser::AST::Node] node
       # @param [Array<Parser::AST::Node>] ancestors
       #
-      def pass_has?(filter_reader, node, ancestors)
+      def pass_has?(filter_reader, ancestors)
         return true unless filter_reader.restrict_children?
 
         filter_reader.has_leaves.all? do |has_rule|

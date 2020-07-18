@@ -76,7 +76,7 @@ module CqlRuby
           walk(child, ancestors.dup + [node], source_reader)
         end
       else
-        if match?(node) && CqlRuby::FilterEvaluator.pass?(filter_reader, node, ancestors)
+        if match?(node) && CqlRuby::FilterEvaluator.pass?(filter_reader, ancestors)
           collector.add(CqlRuby::Crumb.new(node, ancestors, source_reader))
         end
       end
