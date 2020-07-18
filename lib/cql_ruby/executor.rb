@@ -35,7 +35,8 @@ module CqlRuby
       filters: [],
       recursive: true,
       include: nil,
-      exclude: nil
+      exclude: nil,
+      search_type: :token
     )
       @collector = collector
       @filter_reader = filter_reader
@@ -45,6 +46,7 @@ module CqlRuby
       @recursive = recursive
       @include = include
       @exclude = exclude
+      @search_type = search_type
     end
 
     def search_all
@@ -72,11 +74,17 @@ module CqlRuby
 
     def walk(node, ancestors, source_reader)
       if node.is_a?(Parser::AST::Node)
+        if search_for_node?
+          if match?(node.type) && CqlRuby::FilterEvaluator.pass?(filter_reader, ancestors, node)
+            collector.add(CqlRuby::Crumb.new(node, ancestors, source_reader))
+          end
+        end
+
         node.children.flat_map do |child|
           walk(child, ancestors.dup + [node], source_reader)
         end
       else
-        if match?(node) && CqlRuby::FilterEvaluator.pass?(filter_reader, ancestors)
+        if search_for_token? && match?(node) && CqlRuby::FilterEvaluator.pass?(filter_reader, ancestors, node)
           collector.add(CqlRuby::Crumb.new(node, ancestors, source_reader))
         end
       end
@@ -98,6 +106,14 @@ module CqlRuby
       Dir.glob(clean_path)
     end
 
+    def search_for_token?
+      @search_type == :token
+    end
+
+    def search_for_node?
+      @search_type == :node
+    end
+
     attr_reader :collector
     attr_reader :filter_reader
     attr_reader :pattern
@@ -107,33 +123,55 @@ module CqlRuby
   end
 end
 
-CqlRuby::Crumb = Struct.new(:full_name, :ancestors, :source_reader) do
-  def line_no
-    ancestors.last.location.expression.line
-  end
+module CqlRuby
+  class Crumb
+    def initialize(node, ancestors, source_reader)
+      @node = node
+      @ancestors = ancestors
+      @source_reader = source_reader
+    end
 
-  def line_col_no
-    ancestors.last.location.expression.column
-  end
+    def line_no
+      anchor.location.expression.line
+    end
 
-  def source
-    source_reader.source_line(line_no)
-  end
+    def line_col_no
+      anchor.location.expression.column
+    end
 
-  def surrounding_line(offset)
-    source_reader.source_line(line_no + offset)
-  end
+    def source
+      source_reader.source_line(line_no)
+    end
 
-  def file_name
-    source_reader.file
-  end
+    def surrounding_line(offset)
+      source_reader.source_line(line_no + offset)
+    end
 
-  def expression_size
-    ancestors.last.location.expression.size
-  end
+    def file_name
+      source_reader.file
+    end
 
-  def type
-    ancestors.last.type
+    def expression_size
+      anchor.location.expression.size
+    end
+
+    def type
+      anchor.type
+    end
+
+    private
+
+    def anchor
+      if node.is_a?(Symbol)
+        ancestors.last
+      else
+        node
+      end
+    end
+
+    attr_reader :node
+    attr_reader :ancestors
+    attr_reader :source_reader
   end
 end
 

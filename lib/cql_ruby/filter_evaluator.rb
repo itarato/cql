@@ -3,11 +3,11 @@
 module CqlRuby
   class FilterEvaluator
     class << self
-      def pass?(filter_reader, ancestors)
+      def pass?(filter_reader, ancestors, node)
         [
           pass_type?(filter_reader, ancestors),
           pass_nesting?(filter_reader, ancestors),
-          pass_has?(filter_reader, ancestors),
+          pass_has?(filter_reader, ancestors, node),
         ].all?
       end
 
@@ -53,12 +53,18 @@ module CqlRuby
       #
       # @param [CqlRuby::FilterReader] filter_reader
       # @param [Array<Parser::AST::Node>] ancestors
+      # @param [Any<Parser::AST::Node, Symbol>] node
       #
-      def pass_has?(filter_reader, ancestors)
+      def pass_has?(filter_reader, ancestors, node)
         return true unless filter_reader.restrict_children?
 
         filter_reader.has_leaves.all? do |has_rule|
-          anchor_node = try_get_class(ancestors) || try_get_module(ancestors) || try_get_def(ancestors)
+          anchor_node = if node.is_a?(Symbol)
+            # TODO: Expand this to other wrappers (loops, conditions, etc).
+            try_get_class(ancestors) || try_get_module(ancestors) || try_get_def(ancestors)
+          else
+            node
+          end
           next false unless anchor_node
 
           has_node_with_name?(anchor_node, has_rule)

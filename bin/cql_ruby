@@ -7,7 +7,8 @@ def show_help
   puts <<~HELP
         
     \tSYNOPSIS
-    \t\tcql_ruby options pattern path filters ...
+    \t\tcql_ruby [--token] pattern path options filters ...
+    \t\tcql_ruby --node    type    path options filters ...
 
     \tDESCRIPTION
     \t\tCQL (Code Query Language) is a semantic search tool for your Ruby source code.
@@ -49,6 +50,7 @@ def extract_options
     surrounding_lines: 0,
     include_pattern: nil,
     exclude_pattern: nil,
+    search_type: :token,
   }
 
   ARGV.delete_if do |arg|
@@ -72,6 +74,10 @@ def extract_options
         options[:include_pattern] = arg.split('=')[1]
       elsif arg.start_with?('--exclude=')
         options[:exclude_pattern] = arg.split('=')[1]
+      elsif arg == '--node'
+        options[:search_type] = :node
+      elsif arg == '--token'
+        options[:search_type] = :token
       else
         raise "Unknown arg #{arg}"
       end
@@ -124,6 +130,7 @@ begin
     recursive: options[:recursive_search],
     include: options[:include_pattern],
     exclude: options[:exclude_pattern],
+    search_type: options[:search_type],
   ).search_all
 rescue
   puts "Error: #{$!}"

@@ -27,6 +27,12 @@ Find all occurrences of any variable ending with _user that is being assigned a 
 cql_ruby r/_user$/ ./app type:lvasgn nest:block --exclude=%test.rb
 ```
 
+Find all arrays that has a constant definition inside:
+
+```bash
+cql_ruby --node array ./app has:const
+```
+
 ## Install:
 
 ```bash
@@ -35,8 +41,16 @@ gem install cql_ruby
 
 ## Usage:
 
+To find tokens:
+
 ```
 cql_ruby PATTERN PATH OPTIONS FILTERS
+```
+
+To find nodes:
+
+```
+cql_ruby --node TYPE PATH OPTIONS FILTERS
 ```
 
 `cql_ruby --help` for more info.
