@@ -8,6 +8,7 @@ module CqlRuby
           pass_type?(filter_reader, ancestors),
           pass_nesting?(filter_reader, ancestors),
           pass_has?(filter_reader, ancestors, node),
+          pass_pattern?(filter_reader, ancestors, node),
         ].all?
       end
 
@@ -68,6 +69,33 @@ module CqlRuby
           next false unless anchor_node
 
           has_node_with_name?(anchor_node, has_rule)
+        end
+      end
+
+      #
+      # @param [CqlRuby::FilterReader] filter_reader
+      # @param [Array<Parser::AST::Node>] ancestors
+      # @param [Any<Parser::AST::Node, Symbol>] node
+      #
+      def pass_pattern?(filter_reader, ancestors, node)
+        return true unless filter_reader.restrict_pattern?
+
+        filter_reader.patterns.all? do |pattern|
+          pattern_ancestors = pattern.ancestors.dup
+          ancestor_idx = ancestors.size - 1
+
+          while !pattern_ancestors.empty? && ancestor_idx >= 0
+            if CqlRuby::PatternMatcher.match?(pattern_ancestors.last, ancestors[ancestor_idx].type)
+              pattern_ancestors.pop
+            end
+
+            ancestor_idx -= 1
+          end
+          return false unless pattern_ancestors.empty?
+
+          # pattern_descendants = pattern.descendants.dup
+          #
+          true
         end
       end
 

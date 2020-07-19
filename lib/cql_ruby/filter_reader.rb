@@ -8,7 +8,7 @@ module CqlRuby
     SELF_MARKER = 'X'
 
     def self.from(raw_value)
-      parts = raw_value.split('->')
+      parts = raw_value.split('-')
       self_marker_idx = parts.index(SELF_MARKER)
       raise "Missing self marker '#{SELF_MARKER}' in hierarchy pattern." if self_marker_idx.nil?
 
@@ -71,6 +71,8 @@ module CqlRuby
     attr_reader :nest_under
     # @attribute [Array<CqlRuby::NodeSpec>] has_leaves
     attr_reader :has_leaves
+    # @attribute [Array<CqlRuby::HierarchyPattern>] patterns
+    attr_reader :patterns
 
     def initialize(raw_filters)
       super()
