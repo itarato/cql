@@ -93,9 +93,27 @@ module CqlRuby
           end
           return false unless pattern_ancestors.empty?
 
-          # pattern_descendants = pattern.descendants.dup
-          #
-          true
+          pattern_descendants = pattern.descendants.dup
+          match_descendant_pattern?(pattern_descendants, node)
+        end
+      end
+
+      #
+      # @param [Array<String>] pattern_descendants
+      # @param [Parser::AST::Node] node
+      #
+      def match_descendant_pattern?(pattern_descendants, node)
+        return true if pattern_descendants.empty?
+        # If we're at the end and we're still expecting a type - no match.
+        return false unless node.is_a?(Parser::AST::Node)
+
+        node.children.any? do |child|
+          next false unless child.is_a?(Parser::AST::Node)
+          if CqlRuby::PatternMatcher.match?(pattern_descendants.first, child.type)
+            match_descendant_pattern?(pattern_descendants[1..], child)
+          else
+            match_descendant_pattern?(pattern_descendants.dup, child)
+          end
         end
       end
 
