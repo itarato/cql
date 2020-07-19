@@ -17,6 +17,7 @@ def show_help
     \t\tParent node type: type:T(,T)* Example: type:def,send,arg
     \t\tNesting under: nest:T(=NAME) Example: nest:def=save_user nest:class=UserManager
     \t\tHas child: has:T(=NAME) Example: has:const has:def=valid?
+    \t\tPattern: pattern:(T-)*X(-T)* Example: pattern:class-def-X-block
 
     \tOPTIONS
     \t\t--include=PATTERN Parses only files whose name matches the pattern.

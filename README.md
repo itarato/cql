@@ -92,3 +92,11 @@ Examples:
 
 - `cql_ruby foo ./ has:def`
 - `cql_ruby foo ./ has:def=r/user_(save|edit)/i`
+
+### Pattern
+
+Contextualize the matched node. For node searches it can handle ancestors and descendants, for token search only ancestors. X marks the primary match.
+
+Examples:
+
+- `cql_ruby --node def pattern:module-class-X-if-block`
