@@ -3,6 +3,30 @@
 # TODO: Have convenience filters for type:_ such as: isclass, ismodule, isdef ...
 
 module CqlRuby
+  # TODO Move this under filter reader namespace.
+  class HierarchyPattern
+    SELF_MARKER = 'X'
+
+    def self.from(raw_value)
+      parts = raw_value.split('->')
+      self_marker_idx = parts.index(SELF_MARKER)
+      raise "Missing self marker '#{SELF_MARKER}' in hierarchy pattern." if self_marker_idx.nil?
+
+      ancestors = parts[0...self_marker_idx]
+      descendants = parts[self_marker_idx + 1..]
+
+      new(ancestors, descendants)
+    end
+
+    attr_reader :ancestors
+    attr_reader :descendants
+
+    def initialize(ancestors, descendants)
+      @ancestors = ancestors
+      @descendants = descendants
+    end
+  end
+
   class NodeSpec < Struct.new(:type, :name)
     # Make this non duplicated.
     NAME_ANY = '*'
@@ -54,6 +78,7 @@ module CqlRuby
       @allowed_types = []
       @nest_under = []
       @has_leaves = []
+      @patterns = []
 
       parse_raw_filters(raw_filters)
     end
@@ -68,6 +93,10 @@ module CqlRuby
 
     def restrict_children?
       !@has_leaves.empty?
+    end
+
+    def restrict_pattern?
+      !@patterns.empty?
     end
 
     private
@@ -88,6 +117,8 @@ module CqlRuby
           @nest_under << spec
         elsif %w[has h].include?(name)
           @has_leaves << NodeSpec.from(value)
+        elsif %w[pattern p].include?(name)
+          @patterns << HierarchyPattern.from(value)
         end
       end
 
