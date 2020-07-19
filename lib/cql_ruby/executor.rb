@@ -162,10 +162,10 @@ module CqlRuby
     private
 
     def anchor
-      if node.is_a?(Symbol)
-        ancestors.last
-      else
+      if node.is_a?(Parser::AST::Node)
         node
+      else
+        ancestors.last
       end
     end
 
