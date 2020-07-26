@@ -1,57 +1,6 @@
 # frozen_string_literal: true
 
-# TODO: Have convenience filters for type:_ such as: isclass, ismodule, isdef ...
-
 module CqlRuby
-  # TODO Move this under filter reader namespace.
-  class HierarchyPattern
-    SELF_MARKER = 'X'
-
-    def self.from(raw_value)
-      parts = raw_value.split('-')
-      self_marker_idx = parts.index(SELF_MARKER)
-      raise "Missing self marker '#{SELF_MARKER}' in hierarchy pattern." if self_marker_idx.nil?
-
-      ancestors = parts[0...self_marker_idx]
-      descendants = parts[self_marker_idx + 1..]
-
-      new(ancestors, descendants)
-    end
-
-    attr_reader :ancestors
-    attr_reader :descendants
-
-    def initialize(ancestors, descendants)
-      @ancestors = ancestors
-      @descendants = descendants
-    end
-  end
-
-  class NodeSpec < Struct.new(:type, :name)
-    # Make this non duplicated.
-    NAME_ANY = '*'
-
-    class << self
-      #
-      # @param [String] raw_value
-      #   Format: TYPE(=NAME|=*)
-      #   Accepted types: class, module, def, block
-      #
-      def from(raw_value)
-        type, name = raw_value.split('=')
-        name ||= NAME_ANY
-
-        raise "Type '#{type}' is not recognized. See 'cql_ruby --help' for allowed types." unless Parser::Meta::NODE_TYPES.member?(type.to_sym)
-
-        new(type, name)
-      end
-    end
-
-    def restrict_name?
-      name != NAME_ANY
-    end
-  end
-
   #
   # Reads and provides filters.
   #
@@ -63,18 +12,63 @@ module CqlRuby
   # example: type:def,send
   #
   class FilterReader
+    class HierarchyPattern
+      SELF_MARKER = 'X'
+
+      def self.from(raw_value)
+        parts = raw_value.split('-')
+        self_marker_idx = parts.index(SELF_MARKER)
+        raise "Missing self marker '#{SELF_MARKER}' in hierarchy pattern." if self_marker_idx.nil?
+
+        ancestors = parts[0...self_marker_idx]
+        descendants = parts[self_marker_idx + 1..]
+
+        new(ancestors, descendants)
+      end
+
+      attr_reader :ancestors
+      attr_reader :descendants
+
+      def initialize(ancestors, descendants)
+        @ancestors = ancestors
+        @descendants = descendants
+      end
+    end
+
+    class NodeSpec < Struct.new(:type, :name)
+      class << self
+        #
+        # @param [String] raw_value
+        #   Format: TYPE(=NAME|=*)
+        #   Accepted types: class, module, def, block
+        #
+        def from(raw_value)
+          type, name = raw_value.split('=')
+          name ||= CqlRuby::MATCH_ANYTHING
+
+          raise "Type '#{type}' is not recognized. See 'cql_ruby --help' for allowed types." unless Parser::Meta::NODE_TYPES.member?(type.to_sym)
+
+          new(type, name)
+        end
+      end
+
+      def restrict_name?
+        name != CqlRuby::MATCH_ANYTHING
+      end
+    end
+
     NESTING_ALLOWED_TYPES = %w[class module def block].freeze
 
     # @attribute [Array<Symbol>] allowed_types
     attr_reader :allowed_types
-    # @attribute [Array<CqlRuby::NodeSpec>] nest_under
+    # @attribute [Array<CqlRuby::FilterReader::NodeSpec>] nest_under
     attr_reader :nest_under
-    # @attribute [Array<CqlRuby::NodeSpec>] has_leaves
+    # @attribute [Array<CqlRuby::FilterReader::NodeSpec>] has_leaves
     attr_reader :has_leaves
-    # @attribute [Array<CqlRuby::HierarchyPattern>] patterns
+    # @attribute [Array<CqlRuby::FilterReader::HierarchyPattern>] patterns
     attr_reader :patterns
 
-    def initialize(raw_filters)
+    def initialize(raw_filters = [])
       super()
 
       @allowed_types = []

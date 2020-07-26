@@ -6,6 +6,7 @@ module CqlRuby;
   end
 end
 
+require 'cql_ruby/defs'
 require 'cql_ruby/executor'
 require 'cql_ruby/crumb_collector'
 require 'cql_ruby/abstract_printer'

@@ -61,7 +61,6 @@ module CqlRuby
 
         filter_reader.has_leaves.all? do |has_rule|
           anchor_node = if node.is_a?(Symbol)
-            # TODO: Expand this to other wrappers (loops, conditions, etc).
             try_get_class(ancestors) || try_get_module(ancestors) || try_get_def(ancestors)
           else
             node
@@ -151,7 +150,7 @@ module CqlRuby
 
       #
       # @param [Parser::AST::Node] anchor_node
-      # @param [CqlRuby::NodeSpec]
+      # @param [CqlRuby::FilterReader::NodeSpec]
       #
       def has_node_with_name?(anchor_node, has_rule)
         return false unless anchor_node.is_a?(Parser::AST::Node)

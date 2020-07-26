@@ -1,11 +1,9 @@
 # frozen_string_literal: true
 module CqlRuby
   module PatternMatcher
-    MATCH_ANY = '*'
-
     def self.match?(pattern, subject)
       pattern = pattern.to_s
-      return true if pattern == MATCH_ANY
+      return true if pattern == CqlRuby::MATCH_ANYTHING
 
       subject = subject.to_s
 
