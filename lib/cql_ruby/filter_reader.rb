@@ -67,6 +67,8 @@ module CqlRuby
     attr_reader :has_leaves
     # @attribute [Array<CqlRuby::FilterReader::HierarchyPattern>] patterns
     attr_reader :patterns
+    # @attribute [Boolean] is_assigned
+    attr_reader :is_assigned
 
     def initialize(raw_filters = [])
       super()
@@ -75,6 +77,7 @@ module CqlRuby
       @nest_under = []
       @has_leaves = []
       @patterns = []
+      @is_assigned = false
 
       parse_raw_filters(raw_filters)
     end
@@ -95,13 +98,17 @@ module CqlRuby
       !@patterns.empty?
     end
 
+    def restrict_assignment?
+      @is_assigned
+    end
+
     private
 
     # @param [Array<String>] raw_filters
     def parse_raw_filters(raw_filters)
       raw_filters.each do |raw_filter|
         name, value = raw_filter.split(':')
-        raise "Unrecognized filter: #{raw_filter}" if name.nil? || value.nil?
+        raise "Unrecognized filter: #{raw_filter}" if name.nil?
 
         if %w[type t].include?(name)
           @allowed_types += value.split(',').map(&:to_sym)
@@ -115,6 +122,8 @@ module CqlRuby
           @has_leaves << NodeSpec.from(value)
         elsif %w[pattern p].include?(name)
           @patterns << HierarchyPattern.from(value)
+        elsif name == 'assigned'
+          @is_assigned = true
         end
       end
 

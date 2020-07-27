@@ -100,3 +100,21 @@ Contextualize the matched node. For node searches it can handle ancestors and de
 Examples:
 
 - `cql_ruby --node def pattern:module-class-X-if-block`
+
+### Assignment
+
+Matches only for left side assignments in any form of:
+
+```ruby
+x = _
+_.x = _
+_(x: _)
+{ x: _ }
+{ 'x' => _ }
+_[:x] = _
+_['x'] = _
+```
+
+Examples:
+
+- `cql_ruby user ./ assigned`

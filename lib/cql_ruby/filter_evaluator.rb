@@ -9,6 +9,7 @@ module CqlRuby
           pass_nesting?(filter_reader, ancestors),
           pass_has?(filter_reader, ancestors, node),
           pass_pattern?(filter_reader, ancestors, node),
+          pass_assignment?(filter_reader, ancestors, node),
         ].all?
       end
 
@@ -56,6 +57,8 @@ module CqlRuby
       # @param [Array<Parser::AST::Node>] ancestors
       # @param [Any<Parser::AST::Node, Symbol>] node
       #
+      # @return [Boolean]
+      #
       def pass_has?(filter_reader, ancestors, node)
         return true unless filter_reader.restrict_children?
 
@@ -75,6 +78,8 @@ module CqlRuby
       # @param [CqlRuby::FilterReader] filter_reader
       # @param [Array<Parser::AST::Node>] ancestors
       # @param [Any<Parser::AST::Node, Symbol>] node
+      #
+      # @return [Boolean]
       #
       def pass_pattern?(filter_reader, ancestors, node)
         return true unless filter_reader.restrict_pattern?
@@ -98,8 +103,21 @@ module CqlRuby
       end
 
       #
+      # @param [CqlRuby::FilterReader] filter_reader
+      # @param [Array<Parser::AST::Node>] ancestors
+      # @param [Parser::AST::Node] node
+      #
+      # @return [Boolean]
+      #
+      def pass_assignment?(filter_reader, ancestors, node)
+        CqlRuby::Filters::Assignments.pass?(filter_reader, ancestors, node)
+      end
+
+      #
       # @param [Array<String>] pattern_descendants
       # @param [Parser::AST::Node] node
+      #
+      # @return [Boolean]
       #
       def match_descendant_pattern?(pattern_descendants, node)
         return true if pattern_descendants.empty?

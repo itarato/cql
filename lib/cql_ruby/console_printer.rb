@@ -78,7 +78,11 @@ module CqlRuby
       from = crumb.line_col_no
       to = from + crumb.expression_size
 
-      prefix = source[0..from - 1] || ''
+      prefix = if from > 0
+        source[0..from - 1] || ''
+      else
+        ''
+      end
       subject = source[from..to - 1] || ''
       suffix = source[to..] || ''
 

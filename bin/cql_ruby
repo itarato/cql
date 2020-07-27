@@ -2,6 +2,7 @@
 
 require 'parser'
 require 'cql_ruby'
+require 'pry-byebug'
 
 def show_help
   puts <<~HELP
@@ -18,6 +19,7 @@ def show_help
     \t\tNesting under: nest:T(=NAME) Example: nest:def=save_user nest:class=UserManager
     \t\tHas child: has:T(=NAME) Example: has:const has:def=valid?
     \t\tPattern: pattern:(T-)*X(-T)* Example: pattern:class-def-X-block
+    \t\tAssignment left side: assigned Example: assigned
 
     \tOPTIONS
     \t\t--include=PATTERN Parses only files whose name matches the pattern.
