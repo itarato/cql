@@ -6,4 +6,11 @@ module CqlRuby;
   end
 end
 
-Dir.glob(File.dirname(__FILE__) + '/cql_ruby/*.rb').each { |source| require source }
+require 'cql_ruby/defs'
+require 'cql_ruby/executor'
+require 'cql_ruby/crumb_collector'
+require 'cql_ruby/abstract_printer'
+require 'cql_ruby/console_printer'
+require 'cql_ruby/filter_reader'
+require 'cql_ruby/filter_evaluator'
+require 'cql_ruby/pattern_matcher'
