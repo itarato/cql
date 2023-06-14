@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module CqlRuby;
+module CqlRuby
   def self.log(txt)
     p txt
   end

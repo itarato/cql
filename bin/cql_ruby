@@ -1,6 +1,5 @@
 #!/usr/bin/env ruby
 
-require 'parser'
 require 'cql_ruby'
 require 'pry-byebug'
 
